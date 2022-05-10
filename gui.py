@@ -27,14 +27,17 @@ def opratMasterKode():
     lbl.config(anchor=CENTER)
     lbl.pack()
 
+
     txt = Entry(window, width=18)
     txt.pack()
+    txt.focus()
 
     lbl1 = Label(window, text="Gentag Master Password")
     lbl1.pack()
 
     txt2 = Entry(window, width=18)
     txt2.pack()
+
 
     lbl2 = Label(window,)
     lbl2.pack()
@@ -66,20 +69,20 @@ def login():
 
     txt = Entry(window, width=18, show="¤")
     txt.pack()
+    txt.focus()
 
     lbl1 = Label(window)
     lbl1.pack()
 
     def getkode():
         ceckhasedpass = hasKodeordet(txt.get().encode('utf-8'))
-        cursor.execute("SELECT * FROM hovedkode WHERE ID = 1 AND password = ?, [(ceckhasedpass)]")
-        print(ceckhasedpass)
+        cursor.execute("SELECT * FROM hovedkode WHERE ID = 1 AND password = ?", [(ceckhasedpass)])
         return cursor.fetchall()
 
     def checkPassword():
         password = getkode()
 
-        print(password)
+        #print(password)
 
 
         if password:
