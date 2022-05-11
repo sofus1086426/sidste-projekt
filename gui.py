@@ -8,6 +8,8 @@ with sqlite3.connect("koder.db") as db:
 cursor.execute("CREATE TABLE IF NOT EXISTS hovedkode(id INTEGER PRIMARY KEY, password TEXT NOT NULL);")
 
 #Hassing
+
+
 def hasKodeordet(input):
     hash = hashlib.md5(input)
     hash = hash.hexdigest()
@@ -16,9 +18,13 @@ def hasKodeordet(input):
 
 #vinduer
 #theme=
+
+
 window = Tk()
 
+
 window.title("Password box")
+
 
 def opratMasterKode():
     window.geometry("350x150")
@@ -26,7 +32,6 @@ def opratMasterKode():
     lbl = Label(window, text="Lav Et Master Password")
     lbl.config(anchor=CENTER)
     lbl.pack()
-
 
     txt = Entry(window, width=18)
     txt.pack()
@@ -37,7 +42,6 @@ def opratMasterKode():
 
     txt2 = Entry(window, width=18)
     txt2.pack()
-
 
     lbl2 = Label(window,)
     lbl2.pack()
@@ -50,13 +54,14 @@ def opratMasterKode():
             insert_password = """INSERT INTO hovedkode(password) VALUES(?) """
             cursor.execute(insert_password, [(hasedpass)])
             db.commit()
-            kodeskab()
+            kodeSkab()
 
         else:
             lbl2.config(text="Koder masher ikke")
 
     btn = Button(window, text="GEM", command=gemHovedKOde)
     btn.pack(pady=10)
+
 
 def login():
     for widget in window.winfo_children():
@@ -74,19 +79,18 @@ def login():
     lbl1 = Label(window)
     lbl1.pack()
 
-    def getkode():
+    def getKode():
         ceckhasedpass = hasKodeordet(txt.get().encode('utf-8'))
         cursor.execute("SELECT * FROM hovedkode WHERE ID = 1 AND password = ?", [(ceckhasedpass)])
         return cursor.fetchall()
 
     def checkPassword():
-        password = getkode()
+        password = getKode()
 
         #print(password)
 
-
         if password:
-            kodeskab()
+            kodeSkab()
         else:
             txt.delete(0, "end")
             lbl1.config(text="worng")
@@ -94,7 +98,7 @@ def login():
     btn = Button(window, text="Lav", command=checkPassword)
     btn.pack(pady=10)
 
-def kodeskab():
+def kodeSkab():
     for widget in window.winfo_children():
         widget.destroy()
     window.geometry("500x130")
