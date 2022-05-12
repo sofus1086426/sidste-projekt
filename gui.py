@@ -1,11 +1,23 @@
 import sqlite3, hashlib
 from tkinter import *
+from tkinter import simpledialog
+from functools import partial
 
 #databasse
 with sqlite3.connect("koder.db") as db:
     cursor = db.cursor()
 
-cursor.execute("CREATE TABLE IF NOT EXISTS hovedkode(id INTEGER PRIMARY KEY, password TEXT NOT NULL);")
+cursor.execute("""CREATE TABLE IF NOT EXISTS hovedkode(id INTEGER PRIMARY KEY, password TEXT NOT NULL);""")
+
+cursor.execute("""CREATE TABLE IF NOT EXISTS box(id INTEGER PRIMARY KEY, 
+hjemmeside TEXT NOT NULL,
+brugernavn TEXT NOT NULL, kodeord TEXT NOT NULL);""")
+
+#lav pop op
+def popup(text):
+    svar = simpledialog.askstring("input string", text)
+    return (svar)
+
 
 #Hassing
 
@@ -81,7 +93,7 @@ def login():
 
     def getKode():
         ceckhasedpass = hasKodeordet(txt.get().encode('utf-8'))
-        cursor.execute("SELECT * FROM hovedkode WHERE ID = 1 AND password = ?", [(ceckhasedpass)])
+        cursor.execute("""SELECT * FROM hovedkode WHERE ID = 1 AND password = ?""", [(ceckhasedpass)])
         return cursor.fetchall()
 
     def checkPassword():
@@ -101,14 +113,73 @@ def login():
 def kodeSkab():
     for widget in window.winfo_children():
         widget.destroy()
-    window.geometry("500x130")
+
+
+    def tilfoj():
+        text1 = "hjemmedide"
+        text2 = "brugernavn"
+        text3 = "kodeord"
+
+        hjemmeside = popup(text1)
+        brugernavn = popup(text2)
+        kodeord = popup(text3)
+
+        insert_fields = """INSERT INTO box(hjemmeside, brugernavn, kodeord)
+        VALUES (?, ?, ?)
+        """
+        cursor.execute(insert_fields, (hjemmeside, brugernavn, kodeord))
+        db.commit()
+
+        kodeSkab()
+
+    def fjernkode(input):
+        cursor.execute("DELETE FROM box WHERE id = ?", (input,))
+        db.commit()
+        kodeSkab()
+
+    window.geometry("800x350")
 
     lbl = Label(text="BOXEN")
     lbl.config(anchor=CENTER)
-    lbl.pack()
+    lbl.grid(column=1)
 
+    btn = Button(window, text="+", command=tilfoj)
+    btn.grid(column=1, pady=10)
 
-cursor.execute("SELECT * FROM hovedkode")
+    lbl = Label(window, text="hjemmeside")
+    lbl.grid(row=2, column=0, padx=80)
+    lbl = Label(window, text="brugernavn")
+    lbl.grid(row=2, column=1, padx=80)
+    lbl = Label(window, text="kodeord")
+    lbl.grid(row=2, column=2, padx=80)
+
+    cursor.execute("SELECT * FROM box")
+    if(cursor.fetchall() != None):
+        i = 0
+        while True:
+            cursor.execute("SELECT * FROM box")
+            array = cursor.fetchall()
+
+            if(len(array) == 0):
+                break
+
+            lbl1 = Label(window, text=(array[i][3]), font=("Helvetica", 12))#hjemmeside
+            lbl1.grid(column=0, row=i+3)
+            lbl1 = Label(window, text=(array[i][2]), font=("Helvetica", 12))#brugernavn
+            lbl1.grid(column=1, row=i+3)
+            lbl1 = Label(window, text=(array[i][3]), font=("Helvetica", 12))#kode
+            lbl1.grid(column=2, row=i+3)
+
+            btn1 = Button(window, text="Slet", command=partial(fjernkode, array[i][0]))
+            btn1.grid(column=3, row=(i+3), pady=10)
+
+            i = i+1
+
+            cursor.execute('SELECT * FROM box')
+            if(len(cursor.fetchall()) <= i):
+                break
+
+cursor.execute("""SELECT * FROM hovedkode""")
 if cursor.fetchall():
     login()
 else:
