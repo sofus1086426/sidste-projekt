@@ -25,7 +25,8 @@ kdf = PBKDF2HMAC(
 )
 cryptiosNøgle = 0
 
-def crypter(message: bytes, key: bytes) -> bytes:
+
+def krypter(message: bytes, key: bytes) -> bytes:
     return Fernet(key).encrypt(message)
 
 
@@ -95,7 +96,7 @@ def opratMasterKode():
             key = str(uuid.uuid4().hex)
             recoveryKey = hasKodeordet(key.encode('utf-8'))
 
-            global  cryptiosNøgle
+            global cryptiosNøgle
             cryptiosNøgle = base64.urlsafe_b64encode(kdf.derive(txt.get().encode()))
 
             insert_password = """INSERT INTO hovedkode(password, recoveryKey) VALUES(?, ?) """
@@ -222,9 +223,9 @@ def kodeSkab():
         text2 = "brugernavn"
         text3 = "kodeord"
 
-        hjemmeside = crypter(popup(text1).encode(), cryptiosNøgle)
-        brugernavn = crypter(popup(text2).encode(), cryptiosNøgle)
-        kodeord = crypter(popup(text3).encode(), cryptiosNøgle)
+        hjemmeside = krypter(popup(text1).encode(), cryptiosNøgle)
+        brugernavn = krypter(popup(text2).encode(), cryptiosNøgle)
+        kodeord = krypter(popup(text3).encode(), cryptiosNøgle)
 
         insert_fields = """INSERT INTO box(hjemmeside, brugernavn, kodeord)
         VALUES (?, ?, ?)
